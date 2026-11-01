@@ -3,8 +3,13 @@
   "version": "1.0.0",
   "description": "NodeCG Server for RTA Layout",
   "scripts": {
-    "build": "mkdir -p server && cd server && npx -y nodecg-cli setup 1.9.0 && cd .. && cp -r bundles/* server/bundles/ && (cp -r cfg/* server/cfg/ 2>/dev/null || true)",
-    "start": "cd server && node index.js"
+    "build": "cd node_modules/nodecg && npx bower install --allow-root --config.interactive=false",
+    "prestart": "mkdir -p cfg bundles && rm -rf node_modules/nodecg/bundles node_modules/nodecg/cfg && ln -s $PWD/bundles node_modules/nodecg/bundles && ln -s $PWD/cfg node_modules/nodecg/cfg",
+    "start": "node ./node_modules/nodecg/index.js"
+  },
+  "dependencies": {
+    "nodecg": "^1.9.0",
+    "bower": "^1.8.14"
   },
   "engines": {
     "node": "20.x"
