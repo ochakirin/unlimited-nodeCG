@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "4-way RTA layout",
   "nodecg": {
+    "compatibleRange": "^1.9.0",
     "dashboardPanels": [
       { "name": "timer-panel", "title": "タイマー", "width": 2, "file": "timer.html" },
       { "name": "runners-panel", "title": "走者選択", "width": 3, "file": "runners.html" },
