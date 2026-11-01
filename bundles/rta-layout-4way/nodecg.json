@@ -1,1 +1,13 @@
-
+{
+  "name": "rta-layout-4way",
+  "version": "1.0.0",
+  "description": "4-way RTA layout",
+  "dashboardPanels": [
+    { "name": "timer-panel", "title": "タイマー", "width": 2, "file": "timer.html" },
+    { "name": "runners-panel", "title": "走者選択", "width": 3, "file": "runners.html" },
+    { "name": "points-panel", "title": "ポイント管理", "width": 4, "file": "points.html" }
+  ],
+  "graphics": [
+    { "file": "index.html", "width": 1920, "height": 1080 }
+  ]
+}
