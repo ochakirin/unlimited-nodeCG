@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html>
+<head>
 <style>
-  .team-box { border: 1px solid #ccc; padding: 8px; margin-bottom: 8px; }
-  .btn { margin-right: 4px; }
+  .team-box { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+  .btn { margin-right: 4px; padding: 4px 8px; cursor: pointer; }
+  .team-name { font-size: 1.1em; margin-bottom: 6px; }
 </style>
+</head>
 <body>
   <div id="points-controls"></div>
   <script>
     const pointsRep = nodecg.Replicant('points');
+    const teamNames = ['Aチーム', 'Bチーム', 'Cチーム', 'Dチーム'];
     
     pointsRep.on('change', (newVal) => {
       if (!newVal) return;
@@ -15,12 +19,12 @@
       newVal.forEach((pt, index) => {
         html += `
           <div class="team-box">
-            <strong>窓 ${index + 1}</strong> (現在: ${pt} pt)<br>
+            <div class="team-name"><strong>${teamNames[index]}</strong> (現在: ${pt} pt)</div>
             <button class="btn" onclick="addPoint(${index}, 15)">+15</button>
             <button class="btn" onclick="addPoint(${index}, 10)">+10</button>
             <button class="btn" onclick="addPoint(${index}, 7)">+7</button>
             <button class="btn" onclick="addPoint(${index}, 5)">+5</button>
-            <button class="btn" onclick="addPoint(${index}, -1)">-1(修正)</button>
+            <button class="btn" style="margin-left: 10px; color: red;" onclick="addPoint(${index}, -1)">-1(修正)</button>
           </div>
         `;
       });
