@@ -4,18 +4,28 @@
   <div id="runner-controls"></div>
   <script>
     const runnersRep = nodecg.Replicant('runners');
-    // 事前登録された走者リストの例
-    const runnerList = ['走者A', '走者B', '走者C', '走者D', '走者E', '走者F'];
+    
+    // 各チームの走者リストを定義
+    const teamLists = [
+      ['もこ', 'けーじ', 'desa', '℃.', 'るこっく', 'HAKUA(白鴉)', 'レシリア'], // Aチーム (0)
+      ['菩提樹ゆきの', 'mra', '謎の超能力者戸田', 'わいなぎ', 'ぽんた', 'ああ', 'のらこ'], // Bチーム (1)
+      ['タンク姫川', 'さくさく', 'ネッピー', '十兵衛', 'りんだ', '源一郎', 'とーま'], // Cチーム (2)
+      ['cha0scord', 'える', 'ゆじん', 'なぜだ！', 'BANRI', 'DONくさお', '水沢']  // Dチーム (3)
+    ];
+    const teamNames = ['Aチーム', 'Bチーム', 'Cチーム', 'Dチーム'];
 
     runnersRep.on('change', (newVal) => {
       if (!newVal) return;
       let html = '';
       newVal.forEach((name, index) => {
+        const currentTeamList = teamLists[index];
         html += `
-          <div style="margin-bottom: 8px;">
-            <label>窓 ${index + 1}: </label>
-            <select onchange="updateRunner(${index}, this.value)">
-              ${runnerList.map(r => `<option value="${r}" ${r === name ? 'selected' : ''}>${r}</option>`).join('')}
+          <div style="margin-bottom: 12px;">
+            <label style="display: inline-block; width: 60px; font-weight: bold;">${teamNames[index]}</label>
+            <select onchange="updateRunner(${index}, this.value)" style="padding: 4px;">
+              <!-- リストにない初期値対策として空欄を用意 -->
+              <option value="" disabled ${!currentTeamList.includes(name) ? 'selected' : ''}>-- 選択してください --</option>
+              ${currentTeamList.map(r => `<option value="${r}" ${r === name ? 'selected' : ''}>${r}</option>`).join('')}
             </select>
           </div>
         `;
