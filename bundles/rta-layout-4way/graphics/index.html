@@ -1,96 +1,144 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
   <style>
     body {
       margin: 0;
+      padding: 0;
       width: 1920px;
       height: 1080px;
-      background-color: transparent; /* OBS上では透過 */
+      background: transparent;
       font-family: 'Meiryo', sans-serif;
-      color: white;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      overflow: hidden;
       position: relative;
     }
 
-    /* 4窓のコンテナ: 上部と下部にヘッダー領域を設ける想定 */
-    .grid-container {
-      display: grid;
-      grid-template-columns: 960px 960px;
-      grid-template-rows: 540px 540px;
-      width: 1920px;
-      height: 1080px;
-    }
-
-    /* 各プレイヤーの領域。上部をゲーム画面に被らないヘッダーにする */
-    .player-box {
-      position: relative;
-      box-sizing: border-box;
-      border: 2px solid rgba(255, 255, 255, 0.3); /* 境界線（レイアウト確認用） */
-    }
-
-    /* 走者名とポイントの表示バー (上部に配置) */
-    .info-bar {
+    /* 全体の背景（邪魔な場合は消すか、イベントのロゴ背景画像などに差し替えてください） */
+    .layout-bg {
       position: absolute;
-      top: 0; left: 0;
       width: 100%;
-      height: 40px;
-      background: rgba(0, 0, 0, 0.7);
+      height: 100%;
+      background-image: linear-gradient(to bottom, #1a1a2e, #16213e);
+      z-index: -1;
+    }
+
+    /* --- プレイヤーコンテナ --- */
+    /* 1窓あたりのサイズ: 横680px, 縦540px (情報バー30px + ゲーム画面510px) */
+    .player-box {
+      position: absolute;
+      width: 680px;
+      height: 540px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 各窓の配置（左右の端、上下の端に吸着） */
+    #p1 { top: 0; left: 0; }
+    #p2 { top: 0; right: 0; }
+    #p3 { bottom: 0; left: 0; }
+    #p4 { bottom: 0; right: 0; }
+
+    /* --- 情報バー（走者名とポイント） --- */
+    .info-bar {
+      width: 100%;
+      height: 30px;
+      background: rgba(0, 0, 0, 0.85);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 20px;
+      padding: 0 15px;
       box-sizing: border-box;
-      font-size: 24px;
+      font-size: 18px;
       font-weight: bold;
+      border-bottom: 2px solid #555;
     }
 
-    /* 中央のタイマー */
-    .timer-center {
+    .runner-name { color: #fff; text-shadow: 1px 1px 2px #000; }
+    .point-box { color: #ffcc00; text-shadow: 1px 1px 2px #000; }
+
+    /* --- ゲーム画面枠 --- */
+    /* ぴったり4:3の比率（680x510） */
+    .game-screen {
+      width: 680px;
+      height: 510px;
+      background: transparent;
+      box-sizing: border-box;
+      border: 2px solid rgba(255, 255, 255, 0.3); /* OBSで合わせるためのガイドライン */
+    }
+
+    /* --- 中央エリア（タイマー） --- */
+    /* 左右のゲーム画面の隙間にできる 560px の空間 */
+    .center-area {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      top: 0;
+      left: 680px;
+      width: 560px;
+      height: 1080px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* タイマーの装飾 */
+    .timer-center {
       background: rgba(0, 0, 0, 0.9);
       padding: 10px 40px;
-      border: 3px solid #fff;
-      border-radius: 10px;
-      font-size: 48px;
+      border: 4px solid #fff;
+      border-radius: 8px;
+      font-size: 64px;
       font-family: monospace;
-      z-index: 10;
+      font-weight: bold;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
     }
   </style>
 </head>
 <body>
-  <!-- 中央タイマー -->
-  <div class="timer-center" id="timer-display">00:00:00</div>
+  <!-- 背景 -->
+  <div class="layout-bg"></div>
 
-  <!-- 4窓グリッド -->
-  <div class="grid-container">
-    <div class="player-box">
-      <div class="info-bar">
-        <span id="name-0">Runner 1</span>
-        <span><span id="point-0">0</span> pt</span>
-      </div>
+  <!-- 中央エリア -->
+  <div class="center-area">
+    <div class="timer-center" id="timer-display">00:00:00</div>
+  </div>
+
+  <!-- 窓1 (左上) -->
+  <div class="player-box" id="p1">
+    <div class="info-bar">
+      <span class="runner-name" id="name-0">Runner 1</span>
+      <span class="point-box"><span id="point-0">0</span> pt</span>
     </div>
-    <div class="player-box">
-      <div class="info-bar">
-        <span id="name-1">Runner 2</span>
-        <span><span id="point-1">0</span> pt</span>
-      </div>
+    <div class="game-screen"></div>
+  </div>
+
+  <!-- 窓2 (右上) -->
+  <div class="player-box" id="p2">
+    <div class="info-bar">
+      <span class="runner-name" id="name-1">Runner 2</span>
+      <span class="point-box"><span id="point-1">0</span> pt</span>
     </div>
-    <div class="player-box">
-      <div class="info-bar">
-        <span id="name-2">Runner 3</span>
-        <span><span id="point-2">0</span> pt</span>
-      </div>
+    <div class="game-screen"></div>
+  </div>
+
+  <!-- 窓3 (左下) -->
+  <div class="player-box" id="p3">
+    <div class="info-bar">
+      <span class="runner-name" id="name-2">Runner 3</span>
+      <span class="point-box"><span id="point-2">0</span> pt</span>
     </div>
-    <div class="player-box">
-      <div class="info-bar">
-        <span id="name-3">Runner 4</span>
-        <span><span id="point-3">0</span> pt</span>
-      </div>
+    <div class="game-screen"></div>
+  </div>
+
+  <!-- 窓4 (右下) -->
+  <div class="player-box" id="p4">
+    <div class="info-bar">
+      <span class="runner-name" id="name-3">Runner 4</span>
+      <span class="point-box"><span id="point-3">0</span> pt</span>
     </div>
+    <div class="game-screen"></div>
   </div>
 
   <script>
@@ -99,7 +147,7 @@
     const pointsRep = nodecg.Replicant('points');
 
     stopwatchRep.on('change', (newVal) => {
-      document.getElementById('timer-display').innerText = newVal.formatted;
+      if(newVal) document.getElementById('timer-display').innerText = newVal.formatted;
     });
 
     runnersRep.on('change', (newVal) => {
