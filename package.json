@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "NodeCG Server for RTA Layout",
   "scripts": {
+    "prestart": "mkdir -p cfg bundles && rm -rf node_modules/nodecg/bundles node_modules/nodecg/cfg && ln -s $PWD/bundles node_modules/nodecg/bundles && ln -s $PWD/cfg node_modules/nodecg/cfg",
     "start": "node ./node_modules/nodecg/index.js"
   },
   "dependencies": {
