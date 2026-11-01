@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <div id="runner-controls"></div>
+  <script>
+    const runnersRep = nodecg.Replicant('runners');
+    // 事前登録された走者リストの例
+    const runnerList = ['走者A', '走者B', '走者C', '走者D', '走者E', '走者F'];
+
+    runnersRep.on('change', (newVal) => {
+      if (!newVal) return;
+      let html = '';
+      newVal.forEach((name, index) => {
+        html += `
+          <div style="margin-bottom: 8px;">
+            <label>窓 ${index + 1}: </label>
+            <select onchange="updateRunner(${index}, this.value)">
+              ${runnerList.map(r => `<option value="${r}" ${r === name ? 'selected' : ''}>${r}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      });
+      document.getElementById('runner-controls').innerHTML = html;
+    });
+
+    function updateRunner(index, name) {
+      runnersRep.value[index] = name;
+    }
+  </script>
+</body>
+</html>
