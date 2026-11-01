@@ -2,9 +2,8 @@
   "name": "rta-layout-system",
   "version": "1.0.0",
   "description": "NodeCG Server for RTA Layout",
-  "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node ./node_modules/nodecg/index.js"
   },
   "dependencies": {
     "nodecg": "^1.9.0"
