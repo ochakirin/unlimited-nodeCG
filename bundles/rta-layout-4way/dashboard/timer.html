@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <div style="text-align: center;">
+    <h2 id="time-display">00:00:00</h2>
+    <button onclick="nodecg.sendMessage('startTimer')">Start</button>
+    <button onclick="nodecg.sendMessage('stopTimer')">Stop</button>
+    <button onclick="nodecg.sendMessage('resetTimer')">Reset</button>
+  </div>
+  <script>
+    const stopwatch = nodecg.Replicant('stopwatch');
+    stopwatch.on('change', (newVal) => {
+      document.getElementById('time-display').innerText = newVal.formatted;
+    });
+  </script>
+</body>
+</html>
