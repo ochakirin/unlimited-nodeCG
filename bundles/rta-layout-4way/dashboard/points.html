@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<style>
+  .team-box { border: 1px solid #ccc; padding: 8px; margin-bottom: 8px; }
+  .btn { margin-right: 4px; }
+</style>
+<body>
+  <div id="points-controls"></div>
+  <script>
+    const pointsRep = nodecg.Replicant('points');
+    
+    pointsRep.on('change', (newVal) => {
+      if (!newVal) return;
+      let html = '';
+      newVal.forEach((pt, index) => {
+        html += `
+          <div class="team-box">
+            <strong>窓 ${index + 1}</strong> (現在: ${pt} pt)<br>
+            <button class="btn" onclick="addPoint(${index}, 15)">+15</button>
+            <button class="btn" onclick="addPoint(${index}, 10)">+10</button>
+            <button class="btn" onclick="addPoint(${index}, 7)">+7</button>
+            <button class="btn" onclick="addPoint(${index}, 5)">+5</button>
+            <button class="btn" onclick="addPoint(${index}, -1)">-1(修正)</button>
+          </div>
+        `;
+      });
+      document.getElementById('points-controls').innerHTML = html;
+    });
+
+    function addPoint(index, amount) {
+      pointsRep.value[index] += amount;
+    }
+  </script>
+</body>
+</html>
