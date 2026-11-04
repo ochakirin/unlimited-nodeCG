@@ -4,6 +4,7 @@
 <style>
   .team-box { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
   .btn { margin-right: 4px; padding: 4px 8px; cursor: pointer; }
+  .btn-reset { margin-left: 20px; color: white; background-color: #d9534f; border: 1px solid #d43f3a; }
   .team-name { font-size: 1.1em; margin-bottom: 6px; }
 </style>
 </head>
@@ -25,6 +26,8 @@
             <button class="btn" onclick="addPoint(${index}, 7)">+7</button>
             <button class="btn" onclick="addPoint(${index}, 5)">+5</button>
             <button class="btn" style="margin-left: 10px; color: red;" onclick="addPoint(${index}, -1)">-1(修正)</button>
+            <!-- リセットボタンを追加 -->
+            <button class="btn btn-reset" onclick="resetPoint(${index})">リセット(0)</button>
           </div>
         `;
       });
@@ -33,6 +36,13 @@
 
     function addPoint(index, amount) {
       pointsRep.value[index] += amount;
+    }
+
+    // 0に上書きする関数を追加
+    function resetPoint(index) {
+      if (confirm(`${teamNames[index]}のポイントを0にリセットしますか？`)) {
+        pointsRep.value[index] = 0;
+      }
     }
   </script>
 </body>
