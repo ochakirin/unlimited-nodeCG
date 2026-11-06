@@ -10,7 +10,8 @@
       { "name": "points-panel", "title": "ポイント管理", "width": 4, "file": "points.html" }
     ],
     "graphics": [
-      { "file": "index.html", "width": 1920, "height": 1080 }
+      { "file": "index.html", "width": 1920, "height": 1080 },
+      { "file": "layout2.html", "width": 1920, "height": 1080 }
     ]
   }
 }
