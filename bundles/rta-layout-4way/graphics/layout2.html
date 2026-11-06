@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      margin: 0; padding: 0; width: 1920px; height: 1080px;
+      background: transparent; font-family: 'Meiryo', sans-serif;
+      overflow: hidden; position: relative;
+    }
+
+    .layout-bg {
+      position: absolute; width: 100%; height: 100%;
+      background-image: linear-gradient(to bottom, #1a1a2e, #16213e);
+      z-index: -1;
+    }
+
+    .player-box {
+      position: absolute; width: 680px; height: 540px;
+      display: flex; flex-direction: column;
+    }
+
+    /* 左側に2×2で配置 */
+    #p1 { top: 0; left: 0; }
+    #p2 { top: 0; left: 680px; }
+    #p3 { top: 540px; left: 0; }
+    #p4 { top: 540px; left: 680px; }
+
+    /* --- 走者名とポイントのバー --- */
+    .info-bar {
+      width: 100%; height: 32px;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 15px; box-sizing: border-box;
+      font-size: 19px; font-weight: 900;
+      border-bottom: 2px solid #555;
+    }
+
+    .runner-name, .point-box {
+      color: #fff;
+      text-shadow: 
+        2px  0px 0 #000, -2px  0px 0 #000, 
+        0px  2px 0 #000,  0px -2px 0 #000, 
+        2px  2px 0 #000, -2px -2px 0 #000, 
+        2px -2px 0 #000, -2px  2px 0 #000, 
+        3px  3px 6px rgba(0,0,0,1);
+      display: flex; align-items: center;
+    }
+    .point-box { color: #ffcc00; }
+    
+    .team-badge {
+      display: inline-block; padding: 2px 10px; margin-right: 12px;
+      border-radius: 6px; font-size: 16px;
+      text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+      border: 1px solid #fff; box-shadow: 2px 2px 3px rgba(0,0,0,0.8);
+    }
+    .badge-a { background: #d9534f; color: white; }
+    .badge-b { background: #337ab7; color: white; }
+    .badge-c { background: #5cb85c; color: white; }
+    .badge-d { background: #f0ad4e; color: white; }
+
+    .game-screen {
+      width: 680px; height: 508px; background: transparent;
+      box-sizing: border-box; border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* --- 右側の広大な空きスペース --- */
+    .right-area {
+      position: absolute; top: 0; left: 1360px; /* 680+680の位置から開始 */
+      width: 560px; height: 1080px;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+    }
+
+    .timer-center {
+      background: rgba(0, 0, 0, 0.9); padding: 10px 40px;
+      border: 3px solid #fff; border-radius: 8px;
+      font-size: 64px; font-family: monospace; font-weight: bold;
+      color: white; 
+      text-shadow: 
+        2px 2px 0 #000, -2px -2px 0 #000, 
+        2px -2px 0 #000, -2px 2px 0 #000, 
+        5px 5px 10px rgba(0,0,0,0.9);
+      box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    }
+  </style>
+</head>
+<body>
+  <div class="layout-bg"></div>
+
+  <!-- 右側の情報エリア -->
+  <div class="right-area">
+    <div class="timer-center" id="timer-display">00:00:00</div>
+  </div>
+
+  <div class="player-box" id="p1">
+    <div class="info-bar">
+      <span class="runner-name"><span class="team-badge badge-a">Aチーム</span><span id="name-0"></span></span>
+      <span class="point-box"><span id="point-0">0</span> pt</span>
+    </div>
+    <div class="game-screen"></div>
+  </div>
+
+  <div class="player-box" id="p2">
+    <div class="info-bar">
+      <span class="runner-name"><span class="team-badge badge-b">Bチーム</span><span id="name-1"></span></span>
+      <span class="point-box"><span id="point-1">0</span> pt</span>
+    </div>
+    <div class="game-screen"></div>
+  </div>
+
+  <div class="player-box" id="p3">
+    <div class="info-bar">
+      <span class="runner-name"><span class="team-badge badge-c">Cチーム</span><span id="name-2"></span></span>
+      <span class="point-box"><span id="point-2">0</span> pt</span>
+    </div>
+    <div class="game-screen"></div>
+  </div>
+
+  <div class="player-box" id="p4">
+    <div class="info-bar">
+      <span class="runner-name"><span class="team-badge badge-d">Dチーム</span><span id="name-3"></span></span>
+      <span class="point-box"><span id="point-3">0</span> pt</span>
+    </div>
+    <div class="game-screen"></div>
+  </div>
+
+  <script>
+    const stopwatchRep = nodecg.Replicant('stopwatch');
+    const runnersRep = nodecg.Replicant('runners');
+    const pointsRep = nodecg.Replicant('points');
+
+    stopwatchRep.on('change', (newVal) => {
+      if(newVal) document.getElementById('timer-display').innerText = newVal.formatted;
+    });
+
+    runnersRep.on('change', (newVal) => {
+      if (!newVal) return;
+      newVal.forEach((name, i) => {
+        document.getElementById(`name-${i}`).innerText = name;
+      });
+    });
+
+    pointsRep.on('change', (newVal) => {
+      if (!newVal) return;
+      newVal.forEach((pt, i) => {
+        document.getElementById(`point-${i}`).innerText = pt;
+      });
+    });
+  </script>
+</body>
+</html>
