@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: sans-serif; padding: 10px; }
+    .control-group { margin-bottom: 12px; }
+    select { width: 100%; padding: 6px; font-size: 14px; }
+    .status { font-size: 12px; color: #666; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <div class="control-group">
+    <label><strong>表示画像</strong></label>
+    <select id="image-select" onchange="updateImage(this.value)">
+      <option value="">-- スプレッドシート読込中... --</option>
+    </select>
+    <div class="status" id="status-text"></div>
+  </div>
+
+  <script>
+    const imageRep = nodecg.Replicant('currentImage', { defaultValue: '' });
+    const selectEl = document.getElementById('image-select');
+    const statusEl = document.getElementById('status-text');
+
+    // 指定されたスプレッドシートのID
+    const sheetId = '1K7Boh23DXac9K0vXOyXrfNuTNQRfavl0y6-ZPvH1dhA';
+    // TSV(タブ区切り)形式でエクスポートするURL（CSVよりカンマ誤爆に強い）
+    const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=tsv&gid=0`;
+
+    // 1. スプレッドシートの読み込み
+    fetch(csvUrl)
+      .then(res => {
+        if (!res.ok) throw new Error('スプレッドシートの取得に失敗しました');
+        return res.text();
+      })
+      .then(text => {
+        selectEl.innerHTML = '<option value="">-- 画像を非表示 --</option>';
+        const rows = text.split('\n');
+        
+        let loadedCount = 0;
+        rows.forEach((row, i) => {
+          const cols = row.split('\t');
+          // 1行目が「名前」などの見出しならスキップ
+          if (i === 0 && cols[0].includes('名前')) return; 
+          
+          // A列(名前)とB列(URL)が存在する場合のみプルダウンに追加
+          if (cols.length >= 2 && cols[0].trim() !== '') {
+             const opt = document.createElement('option');
+             opt.text = cols[0].trim();  // A列: 画面に表示する名前
+             opt.value = cols[1].trim(); // B列: 実際の画像URL
+             selectEl.appendChild(opt);
+             loadedCount++;
+          }
+        });
+        statusEl.innerText = `${loadedCount} 件の画像を読み込みました。`;
+
+        // 読み込み完了後、現在のReplicantの状態に合わせて選択状態を復元
+        if (imageRep.value) {
+          selectEl.value = imageRep.value;
+        }
+      })
+      .catch(err => {
+        selectEl.innerHTML = '<option value="">読込エラー (権限を確認してください)</option>';
+        statusEl.innerText = err.message;
+        console.error(err);
+      });
+
+    // 2. コントローラー側で選択を変えたら、全視聴者に同期
+    function updateImage(url) {
+      imageRep.value = url;
+    }
+
+    // 3. 別のPC等で変更された場合、この画面のセレクトボックスも追従する
+    imageRep.on('change', (newVal) => {
+      if (selectEl.querySelector(`option[value="${newVal}"]`)) {
+        selectEl.value = newVal;
+      }
+    });
+  </script>
+</body>
+</html>
