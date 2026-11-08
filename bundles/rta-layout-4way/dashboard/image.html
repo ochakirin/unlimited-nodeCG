@@ -22,12 +22,28 @@
     const selectEl = document.getElementById('image-select');
     const statusEl = document.getElementById('status-text');
 
-    // 指定されたスプレッドシートのID
     const sheetId = '1K7Boh23DXac9K0vXOyXrfNuTNQRfavl0y6-ZPvH1dhA';
-    // TSV(タブ区切り)形式でエクスポートするURL（CSVよりカンマ誤爆に強い）
     const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=tsv&gid=0`;
 
-    // 1. スプレッドシートの読み込み
+    // Google DriveのURLを画像直リンクに自動変換する関数
+    function convertToDirectLink(url) {
+      if (!url) return '';
+      // /file/d/XXXX/view の形式
+      const match1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      // ?id=XXXX の形式
+      const match2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      
+      let fileId = null;
+      if (match1) fileId = match1[1];
+      else if (match2) fileId = match2[1];
+
+      // Google DriveのIDが見つかった場合は直リンク形式に変換、それ以外はそのまま返す
+      if (fileId) {
+        return `https://drive.google.com/uc?export=view&id=${fileId}`;
+      }
+      return url;
+    }
+
     fetch(csvUrl)
       .then(res => {
         if (!res.ok) throw new Error('スプレッドシートの取得に失敗しました');
@@ -40,21 +56,19 @@
         let loadedCount = 0;
         rows.forEach((row, i) => {
           const cols = row.split('\t');
-          // 1行目が「名前」などの見出しならスキップ
           if (i === 0 && cols[0].includes('名前')) return; 
           
-          // A列(名前)とB列(URL)が存在する場合のみプルダウンに追加
           if (cols.length >= 2 && cols[0].trim() !== '') {
              const opt = document.createElement('option');
-             opt.text = cols[0].trim();  // A列: 画面に表示する名前
-             opt.value = cols[1].trim(); // B列: 実際の画像URL
+             opt.text = cols[0].trim();
+             // URLを変換関数に通してからvalueにセットする
+             opt.value = convertToDirectLink(cols[1].trim());
              selectEl.appendChild(opt);
              loadedCount++;
           }
         });
         statusEl.innerText = `${loadedCount} 件の画像を読み込みました。`;
 
-        // 読み込み完了後、現在のReplicantの状態に合わせて選択状態を復元
         if (imageRep.value) {
           selectEl.value = imageRep.value;
         }
@@ -62,15 +76,12 @@
       .catch(err => {
         selectEl.innerHTML = '<option value="">読込エラー (権限を確認してください)</option>';
         statusEl.innerText = err.message;
-        console.error(err);
       });
 
-    // 2. コントローラー側で選択を変えたら、全視聴者に同期
     function updateImage(url) {
       imageRep.value = url;
     }
 
-    // 3. 別のPC等で変更された場合、この画面のセレクトボックスも追従する
     imageRep.on('change', (newVal) => {
       if (selectEl.querySelector(`option[value="${newVal}"]`)) {
         selectEl.value = newVal;
