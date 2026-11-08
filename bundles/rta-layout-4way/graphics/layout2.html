@@ -70,10 +70,11 @@
     }
 
     /* --- 新規追加：画像表示エリア --- */
+/* --- 新規追加：画像表示エリア --- */
     .image-container {
-      width: 500px;
-      height: 400px; /* 画像の最大高さ */
-      margin-bottom: 40px; /* タイマーとの隙間 */
+      width: 540px;  /* 500px → 540px (右エリア560pxの限界ギリギリまで拡大) */
+      height: 650px; /* 400px → 650px (縦の空間も大きく広げ、縦長の画像も巨大化) */
+      margin-bottom: 30px; /* タイマーとの隙間を少し詰める */
       display: flex;
       justify-content: center;
       align-items: center;
