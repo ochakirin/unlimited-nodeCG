@@ -39,7 +39,7 @@
 
       // Google DriveのIDが見つかった場合は直リンク形式に変換、それ以外はそのまま返す
       if (fileId) {
-        return `https://drive.google.com/uc?export=view&id=${fileId}`;
+        return `https://lh3.googleusercontent.com/d/${fileId}`;
       }
       return url;
     }
